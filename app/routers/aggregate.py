@@ -1,0 +1,28 @@
+from fastapi import APIRouter
+import asyncio
+from app.schemas.aggregate import AggregateResponse
+from app.services.pdb_service import fetch_pdb_metadata
+from app.services.ncbi_service import fetch_gene_summary
+
+router = APIRouter()
+
+@router.get("/aggregate", response_model=AggregateResponse)
+async def get_aggregate(term: str):
+    pdb_task = fetch_pdb_metadata(term)
+    ncbi_task = fetch_gene_summary(term)
+    
+    results = await asyncio.gather(pdb_task, ncbi_task, return_exceptions=True)
+    
+    pdb_result = None
+    if not isinstance(results[0], Exception):
+        pdb_result = results[0]
+        
+    ncbi_result = None
+    if not isinstance(results[1], Exception):
+        ncbi_result = results[1]
+        
+    return AggregateResponse(
+        query=term,
+        pdb_result=pdb_result,
+        ncbi_result=ncbi_result
+    )
