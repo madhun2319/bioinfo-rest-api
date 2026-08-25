@@ -1,0 +1,17 @@
+docs:
+  - changed-files:
+    - any-glob-to-any-file: 'docs/**/*'
+    - any-glob-to-any-file: '*.md'
+
+api:
+  - changed-files:
+    - any-glob-to-any-file: 'app/api/**/*'
+    - any-glob-to-any-file: 'app/routers/**/*'
+
+core:
+  - changed-files:
+    - any-glob-to-any-file: 'app/core/**/*'
+
+ci:
+  - changed-files:
+    - any-glob-to-any-file: '.github/**/*'

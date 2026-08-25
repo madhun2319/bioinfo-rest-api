@@ -1,0 +1,14 @@
+site_name: BioInfo REST API
+theme:
+  name: material
+  palette:
+    scheme: slate
+    primary: deep purple
+    accent: light blue
+plugins:
+  - search
+  - mkdocstrings
+nav:
+  - Home: index.md
+  - Architecture Decisions:
+    - 0001: adr/0001-record-architecture-decisions.md
