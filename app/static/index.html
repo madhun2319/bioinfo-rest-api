@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BioInfo Nexus</title>
+    <meta name="description" content="Federated Search Engine for RCSB PDB & NCBI">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="background-mesh"></div>
+    
+    <main class="container">
+        <header>
+            <h1 class="glow-text">BioInfo Nexus</h1>
+            <p class="subtitle">Federated Search Engine for RCSB PDB & NCBI</p>
+        </header>
+
+        <section class="search-section">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Enter Gene or PDB ID (e.g. BRCA1, 4HHB)..." autocomplete="off" />
+                <button id="searchBtn" aria-label="Search">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </button>
+            </div>
+            <div class="loader" id="loader"></div>
+        </section>
+
+        <section class="results-grid" id="resultsGrid">
+            <!-- PDB Card -->
+            <div class="glass-card result-card hidden" id="pdbCard">
+                <div class="card-header">
+                    <span class="badge badge-pdb">RCSB PDB</span>
+                    <h2 id="pdbTitle">Structure Name</h2>
+                </div>
+                <div class="card-body">
+                    <div class="data-row"><span>ID:</span> <strong id="pdbId">--</strong></div>
+                    <div class="data-row"><span>Organism:</span> <strong id="pdbOrganism">--</strong></div>
+                    <div class="data-row"><span>Method:</span> <strong id="pdbMethod">--</strong></div>
+                    <div class="data-row"><span>Resolution:</span> <strong id="pdbResolution">--</strong></div>
+                </div>
+            </div>
+
+            <!-- NCBI Card -->
+            <div class="glass-card result-card hidden" id="ncbiCard">
+                <div class="card-header">
+                    <span class="badge badge-ncbi">NCBI GENE</span>
+                    <h2 id="ncbiTitle">Gene Name</h2>
+                </div>
+                <div class="card-body">
+                    <div class="data-row"><span>Gene ID:</span> <strong id="ncbiId">--</strong></div>
+                    <div class="data-row"><span>Symbol:</span> <strong id="ncbiSymbol">--</strong></div>
+                    <div class="data-row"><span>Organism:</span> <strong id="ncbiOrganism">--</strong></div>
+                    <p class="description" id="ncbiDesc">--</p>
+                </div>
+            </div>
+        </section>
+        
+        <div id="errorState" class="hidden error-state">
+            <h3>No data found across databases.</h3>
+            <p>Try searching for a different identifier.</p>
+        </div>
+    </main>
+
+    <script src="/app.js"></script>
+</body>
+</html>
