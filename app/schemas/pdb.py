@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional, List
 
+
 class PdbMetadata(BaseModel):
     entry_id: str
     title: Optional[str] = None

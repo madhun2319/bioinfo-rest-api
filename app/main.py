@@ -6,6 +6,7 @@ from app.core.http_client import get_client, close_client
 from app.core.redis_client import get_redis, close_redis
 from app.core.config import settings
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Initialize the global HTTP client pool and Redis
@@ -15,6 +16,7 @@ async def lifespan(app: FastAPI):
     # Cleanup on shutdown
     await close_client()
     await close_redis()
+
 
 app = FastAPI(title="BioInfo REST API", lifespan=lifespan)
 
