@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'vite'
@@ -14,5 +15,11 @@ export default defineConfig({
         changeOrigin: true,
       }
     }
+  },
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    pool: 'forks',
   }
 })
+

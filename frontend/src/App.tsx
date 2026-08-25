@@ -40,7 +40,8 @@ function App() {
     setResult(null);
 
     try {
-      const response = await fetch(`/api/aggregate?term=${encodeURIComponent(query)}`);
+      const baseUrl = import.meta.env.VITE_API_URL || '';
+      const response = await fetch(`${baseUrl}/api/aggregate?term=${encodeURIComponent(query)}`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch data from API');

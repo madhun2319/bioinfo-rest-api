@@ -13,9 +13,14 @@ async def async_client():
 
 
 @pytest.fixture(autouse=True)
-def clear_caches():
-    from app.services.pdb_service import fetch_pdb_metadata
-    from app.services.ncbi_service import fetch_gene_summary
+def mock_redis(mocker):
+    import app.core.redis_client as rc
+    mock = mocker.AsyncMock()
+    mock.get.return_value = None
+    rc._redis_client = mock
+    yield
+    rc._redis_client = None
 
-    fetch_pdb_metadata.cache_clear()
-    fetch_gene_summary.cache_clear()
+@pytest.fixture(autouse=True)
+def clear_caches():
+    pass
