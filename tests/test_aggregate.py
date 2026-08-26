@@ -4,7 +4,6 @@ from httpx import Response
 
 original_get = httpx.AsyncClient.get
 
-
 @pytest.mark.asyncio
 async def test_aggregate_success(async_client, mocker):
     mock_get = mocker.patch("httpx.AsyncClient.get")
@@ -28,6 +27,10 @@ async def test_aggregate_success(async_client, mocker):
             return Response(
                 200, json={"result": {"1234": {"name": "GeneX"}}}, request=mocker.Mock()
             )
+        elif "uniprot.org" in url_str:
+            return Response(
+                200, json={"primaryAccession": "P01308"}, request=mocker.Mock()
+            )
         return Response(404, request=mocker.Mock())
 
     mock_get.side_effect = side_effect
@@ -38,6 +41,7 @@ async def test_aggregate_success(async_client, mocker):
     assert data["query"] == "1XYZ"
     assert data["pdb_result"]["entry_id"] == "1XYZ"
     assert data["ncbi_result"]["gene_id"] == "1234"
+    assert data["uniprot_result"]["primary_accession"] == "P01308"
 
 
 @pytest.mark.asyncio
@@ -59,6 +63,8 @@ async def test_aggregate_partial_failure(async_client, mocker):
             return Response(
                 200, json={"result": {"1234": {"name": "GeneX"}}}, request=mocker.Mock()
             )
+        elif "uniprot.org" in url_str:
+            return Response(404, json={}, request=mocker.Mock())
         return Response(404, request=mocker.Mock())
 
     mock_get.side_effect = side_effect
@@ -68,3 +74,4 @@ async def test_aggregate_partial_failure(async_client, mocker):
     data = response.json()
     assert data["pdb_result"] is None
     assert data["ncbi_result"]["gene_id"] == "1234"
+    assert data["uniprot_result"] is None

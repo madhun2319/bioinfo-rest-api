@@ -1,22 +1,50 @@
 # Contributing to BioInfo REST API
 
-First off, thank you for considering contributing to the BioInfo REST API! It's people like you that make the open-source community such an amazing place to learn, inspire, and create.
+Thank you for considering contributing! ??
 
-## Development Setup
+## How to Get Started
 
-We highly recommend using our **GitHub Codespaces** integration. It automatically builds the Python 3.11 environment, installs dependencies, and configures the IDE for you.
+1. **Fork the repository** and clone it locally.
+2. Create a new branch for your change:
+   `ash
+   git checkout -b my-feature
+   `
+3. Install the development dependencies:
+   `ash
+   pip install -r requirements.txt
+   pip install -r dev-requirements.txt  # optional, includes testing tools
+   `
+4. Make your changes. Please keep the code style consistent:
+   - Run lack . and uff . before committing.
+   - Add type hints where appropriate.
+5. Write or update tests in the 	ests/ directory.
+6. Ensure all tests pass:
+   `ash
+   pytest
+   `
+7. Commit with a clear, concise message and push:
+   `ash
+   git push origin my-feature
+   `
+8. Open a Pull Request against the master branch.
 
-If you are running locally:
-1. Fork the repo and clone it locally.
-2. `pip install -r requirements.txt`
-3. Make your changes in a new branch (`git checkout -b feature/amazing-feature`).
+## Reporting Issues
 
-## Pull Request Process
+- Use **GitHub Issues**.
+- Include a clear title, description, and steps to reproduce.
+- Tag the issue with the appropriate label (ug, enhancement, etc.).
 
-1. Ensure all new code has 100% test coverage. Run tests using `pytest tests/`.
-2. Ensure code is formatted with `black`.
-3. Update the README.md with details of changes to the interface if applicable.
-4. Open a Pull Request! We usually review within 24 hours.
+## Pull Request Guidelines
 
-## Found a Bug?
-Open an issue using the Bug Report template! We triage issues daily.
+- Keep PRs small and focused on a single concept.
+- Ensure the CI pipeline passes (tests, linting, type checking).
+- Reference related issues using #<issue-number>.
+- Include a brief description of what the PR does and why.
+
+## Code of Conduct
+
+By contributing you agree to follow the project's [Code of Conduct](CODE_OF_CONDUCT.md).
+
+---
+
+Happy coding! ??

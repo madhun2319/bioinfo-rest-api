@@ -6,6 +6,7 @@
   [![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688.svg?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
   [![GitHub Codespaces](https://img.shields.io/badge/Codespaces-Ready-24292e.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/features/codespaces)
   [![Build Status](https://img.shields.io/github/actions/workflow/status/madhun2319/bioinfo-rest-api/ci.yml?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/madhun2319/bioinfo-rest-api/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
   <h3 align="center">Next-Gen Bioinformatics REST API Wrapper</h3>
   <p align="center">
@@ -17,6 +18,17 @@
 </div>
 
 <hr>
+## 🤝 Get Involved
+
+We’re proud to open‑source this API under the MIT license. You’re welcome to:
+
+- ⭐ Star the repo
+- 🐛 Report bugs or request features via GitHub Issues
+- 🔀 Submit pull requests (see **CONTRIBUTING.md**)
+- 📚 Share use‑cases with the community
+
+Check out the **README** badges for our license, build status, and package version.
+
 
 ## 🧬 Overview
 Welcome to the **Bioinformatics REST API Wrapper**. Designed from the ground up to be resilient, memory-efficient, and developer-friendly. This API aggregates critical genomic and structural metadata into a single, federated endpoint. 
