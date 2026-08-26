@@ -1,5 +1,6 @@
 import json
 import httpx
+import logging
 from fastapi import HTTPException
 from tenacity import (
     retry,
@@ -10,6 +11,8 @@ from tenacity import (
 from app.core.http_client import get_client
 from app.core.redis_client import get_redis
 from app.schemas.uniprot import UniprotMetadata
+
+logger = logging.getLogger(__name__)
 
 
 @retry(
@@ -29,12 +32,15 @@ async def _fetch_uniprot_api(url: str) -> dict:
 async def fetch_uniprot_metadata(accession: str) -> UniprotMetadata:
     redis = get_redis()
     cache_key = f"uniprot:{accession.upper()}"
-    cached_data = await redis.get(cache_key)
+    
+    try:
+        cached_data = await redis.get(cache_key)
+        if cached_data:
+            return UniprotMetadata(**json.loads(cached_data))
+    except Exception as e:
+        logger.error(f"Redis cache unavailable during GET for {cache_key}: {e}")
 
-    if cached_data:
-        return UniprotMetadata(**json.loads(cached_data))
-
-    url = f"https://rest.uniprot.org/uniprotkb/{accession.upper()}"
+    url = f"https://rest.uniprot.org/uniprotkb/{accession.upper()}.json"
 
     try:
         data = await _fetch_uniprot_api(url)
@@ -43,7 +49,7 @@ async def fetch_uniprot_metadata(accession: str) -> UniprotMetadata:
             raise HTTPException(
                 status_code=503, detail="Upstream service unavailable or rate limited"
             )
-        raise HTTPException(status_code=502, detail="Bad gateway")
+        raise HTTPException(status_code=502, detail="Bad gateway to UniProt")
     except httpx.RequestError:
         raise HTTPException(
             status_code=504, detail="Upstream service timeout or network error"
@@ -77,5 +83,8 @@ async def fetch_uniprot_metadata(accession: str) -> UniprotMetadata:
         sequence_length=sequence_length
     )
 
-    await redis.setex(cache_key, 3600, metadata.model_dump_json())
+    try:
+        await redis.setex(cache_key, 3600, metadata.model_dump_json())
+    except Exception:
+        pass
     return metadata

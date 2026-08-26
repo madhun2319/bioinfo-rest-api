@@ -1,5 +1,6 @@
 import json
 import httpx
+import logging
 from fastapi import HTTPException
 from tenacity import (
     retry,
@@ -11,6 +12,8 @@ from app.core.http_client import get_client
 from app.core.redis_client import get_redis
 from app.core.config import settings
 from app.schemas.ncbi import GeneSummary
+
+logger = logging.getLogger(__name__)
 
 NCBI_TOOL = "BioAPIWrapper"
 NCBI_EMAIL = "developer@example.com"
@@ -33,10 +36,13 @@ async def _fetch_ncbi_api(url: str, params: dict) -> dict:
 async def fetch_gene_summary(gene_id: str) -> GeneSummary:
     redis = get_redis()
     cache_key = f"ncbi_gene:{gene_id.upper()}"
-    cached_data = await redis.get(cache_key)
-
-    if cached_data:
-        return GeneSummary(**json.loads(cached_data))
+    
+    try:
+        cached_data = await redis.get(cache_key)
+        if cached_data:
+            return GeneSummary(**json.loads(cached_data))
+    except Exception as e:
+        logger.error(f"Redis cache unavailable during GET for {cache_key}: {e}")
 
     search_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
     search_params = {
@@ -88,5 +94,9 @@ async def fetch_gene_summary(gene_id: str) -> GeneSummary:
         organism=result.get("organism", {}).get("scientificname"),
     )
 
-    await redis.setex(cache_key, 3600, summary.model_dump_json())
+    try:
+        await redis.setex(cache_key, 3600, summary.model_dump_json())
+    except Exception:
+        pass
+        
     return summary

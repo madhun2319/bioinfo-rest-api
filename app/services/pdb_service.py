@@ -1,5 +1,6 @@
 import json
 import httpx
+import logging
 from fastapi import HTTPException
 from tenacity import (
     retry,
@@ -10,6 +11,8 @@ from tenacity import (
 from app.core.http_client import get_client
 from app.core.redis_client import get_redis
 from app.schemas.pdb import PdbMetadata
+
+logger = logging.getLogger(__name__)
 
 
 @retry(
@@ -28,11 +31,14 @@ async def _fetch_pdb_api(url: str) -> dict:
 
 async def fetch_pdb_metadata(pdb_id: str) -> PdbMetadata:
     redis = get_redis()
-    cache_key = f"pdb:{pdb_id.upper()}"
-    cached_data = await redis.get(cache_key)
-
-    if cached_data:
-        return PdbMetadata(**json.loads(cached_data))
+    cache_key = f"pdb_meta:{pdb_id.upper()}"
+    
+    try:
+        cached_data = await redis.get(cache_key)
+        if cached_data:
+            return PdbMetadata(**json.loads(cached_data))
+    except Exception as e:
+        logger.error(f"Redis cache unavailable during GET for {cache_key}: {e}")
 
     url = f"https://data.rcsb.org/rest/v1/core/entry/{pdb_id.upper()}"
 
@@ -78,5 +84,8 @@ async def fetch_pdb_metadata(pdb_id: str) -> PdbMetadata:
         molecular_weight=molecular_weight,
     )
 
-    await redis.setex(cache_key, 3600, metadata.model_dump_json())
+    try:
+        await redis.setex(cache_key, 3600, metadata.model_dump_json())
+    except Exception:
+        pass
     return metadata

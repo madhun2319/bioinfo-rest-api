@@ -26,11 +26,17 @@ interface UniprotResult {
   sequence_length: number | null;
 }
 
+interface ServiceResponse<T> {
+  status: 'success' | 'not_found' | 'error';
+  data: T | null;
+  error_message: string | null;
+}
+
 interface AggregateResponse {
   query: string;
-  pdb_result: PdbResult | null;
-  ncbi_result: NcbiResult | null;
-  uniprot_result: UniprotResult | null;
+  pdb_result: ServiceResponse<PdbResult>;
+  ncbi_result: ServiceResponse<NcbiResult>;
+  uniprot_result: ServiceResponse<UniprotResult>;
 }
 
 function App() {
@@ -113,37 +119,43 @@ function App() {
         {result && !loading && (
           <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* PDB Card */}
-            <div className="glass-card flex flex-col h-full transform hover:-translate-y-1 transition-all duration-300">
+            <div className={`glass-card flex flex-col h-full transform hover:-translate-y-1 transition-all duration-300 ${result.pdb_result.status === 'error' ? 'border-yellow-500/50 bg-yellow-500/5' : ''}`}>
               <div className="p-6 border-b border-white/10 flex flex-col h-[140px]">
                 <div className="inline-flex items-center gap-2 bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider w-max mb-4">
                   <Database className="w-3 h-3" /> RCSB PDB
                 </div>
                 <h2 className="text-xl font-bold text-white line-clamp-2 leading-tight">
-                  {result.pdb_result?.title || 'Structure Unknown'}
+                  {result.pdb_result.status === 'success' ? (result.pdb_result.data?.title || 'Structure Unknown') : 'Structure Unknown'}
                 </h2>
               </div>
               <div className="p-6 flex-grow flex flex-col gap-4">
-                {result.pdb_result ? (
+                {result.pdb_result.status === 'success' && result.pdb_result.data ? (
                   <>
                     <div className="flex flex-col pb-3 border-b border-white/5">
                       <span className="text-xs text-slate-400 uppercase tracking-wider mb-1">PDB ID</span>
-                      <strong className="text-white font-mono text-lg">{result.pdb_result.entry_id}</strong>
+                      <strong className="text-white font-mono text-lg">{result.pdb_result.data.entry_id}</strong>
                     </div>
                     <div className="flex flex-col pb-3 border-b border-white/5">
                       <span className="text-xs text-slate-400 uppercase tracking-wider mb-1">Method</span>
                       <strong className="text-slate-200">
-                        {result.pdb_result.experimental_method?.join(', ') || 'N/A'}
+                        {result.pdb_result.data.experimental_method?.join(', ') || 'N/A'}
                       </strong>
                     </div>
                     <div className="flex flex-col">
                       <span className="text-xs text-slate-400 uppercase tracking-wider mb-1">Resolution</span>
                       <strong className="text-slate-200">
-                        {result.pdb_result.resolution_combined?.map(r => `${r}Å`).join(', ') || 'N/A'}
+                        {result.pdb_result.data.resolution_combined?.map(r => `${r}Å`).join(', ') || 'N/A'}
                       </strong>
                     </div>
                   </>
+                ) : result.pdb_result.status === 'error' ? (
+                  <div className="flex-grow flex flex-col items-center justify-center text-yellow-400/80 py-8 text-center">
+                    <AlertCircle className="w-12 h-12 mb-4 opacity-50" />
+                    <p className="font-semibold mb-2">Sync Failed</p>
+                    <p className="text-sm opacity-80">{result.pdb_result.error_message}</p>
+                  </div>
                 ) : (
-                  <div className="flex-grow flex flex-col items-center justify-center text-slate-400 py-8">
+                  <div className="flex-grow flex flex-col items-center justify-center text-slate-400 py-8 text-center">
                     <Database className="w-12 h-12 mb-4 opacity-20" />
                     <p>No structural data found</p>
                   </div>
@@ -152,33 +164,39 @@ function App() {
             </div>
 
             {/* NCBI Card */}
-            <div className="glass-card flex flex-col h-full transform hover:-translate-y-1 transition-all duration-300">
+            <div className={`glass-card flex flex-col h-full transform hover:-translate-y-1 transition-all duration-300 ${result.ncbi_result.status === 'error' ? 'border-yellow-500/50 bg-yellow-500/5' : ''}`}>
               <div className="p-6 border-b border-white/10 flex flex-col h-[140px]">
                 <div className="inline-flex items-center gap-2 bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider w-max mb-4">
                   <Dna className="w-3 h-3" /> NCBI Gene
                 </div>
                 <h2 className="text-xl font-bold text-white line-clamp-2 leading-tight">
-                  {result.ncbi_result?.description || 'Gene Unknown'}
+                  {result.ncbi_result.status === 'success' ? (result.ncbi_result.data?.description || 'Gene Unknown') : 'Gene Unknown'}
                 </h2>
               </div>
               <div className="p-6 flex-grow flex flex-col gap-4">
-                {result.ncbi_result ? (
+                {result.ncbi_result.status === 'success' && result.ncbi_result.data ? (
                   <>
                     <div className="flex flex-col pb-3 border-b border-white/5">
                       <span className="text-xs text-slate-400 uppercase tracking-wider mb-1">Gene ID</span>
-                      <strong className="text-white font-mono text-lg">{result.ncbi_result.gene_id}</strong>
+                      <strong className="text-white font-mono text-lg">{result.ncbi_result.data.gene_id}</strong>
                     </div>
                     <div className="flex flex-col pb-3 border-b border-white/5">
                       <span className="text-xs text-slate-400 uppercase tracking-wider mb-1">Symbol</span>
-                      <strong className="text-slate-200">{result.ncbi_result.name || 'N/A'}</strong>
+                      <strong className="text-slate-200">{result.ncbi_result.data.name || 'N/A'}</strong>
                     </div>
                     <div className="flex flex-col">
                       <span className="text-xs text-slate-400 uppercase tracking-wider mb-1">Organism</span>
-                      <strong className="text-slate-200">{result.ncbi_result.organism || 'N/A'}</strong>
+                      <strong className="text-slate-200">{result.ncbi_result.data.organism || 'N/A'}</strong>
                     </div>
                   </>
+                ) : result.ncbi_result.status === 'error' ? (
+                  <div className="flex-grow flex flex-col items-center justify-center text-yellow-400/80 py-8 text-center">
+                    <AlertCircle className="w-12 h-12 mb-4 opacity-50" />
+                    <p className="font-semibold mb-2">Sync Failed</p>
+                    <p className="text-sm opacity-80">{result.ncbi_result.error_message}</p>
+                  </div>
                 ) : (
-                  <div className="flex-grow flex flex-col items-center justify-center text-slate-400 py-8">
+                  <div className="flex-grow flex flex-col items-center justify-center text-slate-400 py-8 text-center">
                     <Dna className="w-12 h-12 mb-4 opacity-20" />
                     <p>No gene summary found</p>
                   </div>
@@ -187,35 +205,41 @@ function App() {
             </div>
 
             {/* UniProt Card */}
-            <div className="glass-card flex flex-col h-full transform hover:-translate-y-1 transition-all duration-300">
+            <div className={`glass-card flex flex-col h-full transform hover:-translate-y-1 transition-all duration-300 ${result.uniprot_result.status === 'error' ? 'border-yellow-500/50 bg-yellow-500/5' : ''}`}>
               <div className="p-6 border-b border-white/10 flex flex-col h-[140px]">
                 <div className="inline-flex items-center gap-2 bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider w-max mb-4">
                   <Database className="w-3 h-3" /> UniProtKB
                 </div>
                 <h2 className="text-xl font-bold text-white line-clamp-2 leading-tight">
-                  {result.uniprot_result?.protein_name || 'Protein Unknown'}
+                  {result.uniprot_result.status === 'success' ? (result.uniprot_result.data?.protein_name || 'Protein Unknown') : 'Protein Unknown'}
                 </h2>
               </div>
               <div className="p-6 flex-grow flex flex-col gap-4">
-                {result.uniprot_result ? (
+                {result.uniprot_result.status === 'success' && result.uniprot_result.data ? (
                   <>
                     <div className="flex flex-col pb-3 border-b border-white/5">
                       <span className="text-xs text-slate-400 uppercase tracking-wider mb-1">Accession</span>
-                      <strong className="text-white font-mono text-lg">{result.uniprot_result.primary_accession}</strong>
+                      <strong className="text-white font-mono text-lg">{result.uniprot_result.data.primary_accession}</strong>
                     </div>
                     <div className="flex flex-col pb-3 border-b border-white/5">
                       <span className="text-xs text-slate-400 uppercase tracking-wider mb-1">Organism</span>
-                      <strong className="text-slate-200">{result.uniprot_result.organism || 'N/A'}</strong>
+                      <strong className="text-slate-200">{result.uniprot_result.data.organism || 'N/A'}</strong>
                     </div>
                     <div className="flex flex-col">
                       <span className="text-xs text-slate-400 uppercase tracking-wider mb-1">Sequence Length</span>
                       <strong className="text-slate-200">
-                        {result.uniprot_result.sequence_length ? `${result.uniprot_result.sequence_length} aa` : 'N/A'}
+                        {result.uniprot_result.data.sequence_length ? `${result.uniprot_result.data.sequence_length} aa` : 'N/A'}
                       </strong>
                     </div>
                   </>
+                ) : result.uniprot_result.status === 'error' ? (
+                  <div className="flex-grow flex flex-col items-center justify-center text-yellow-400/80 py-8 text-center">
+                    <AlertCircle className="w-12 h-12 mb-4 opacity-50" />
+                    <p className="font-semibold mb-2">Sync Failed</p>
+                    <p className="text-sm opacity-80">{result.uniprot_result.error_message}</p>
+                  </div>
                 ) : (
-                  <div className="flex-grow flex flex-col items-center justify-center text-slate-400 py-8">
+                  <div className="flex-grow flex flex-col items-center justify-center text-slate-400 py-8 text-center">
                     <Database className="w-12 h-12 mb-4 opacity-20" />
                     <p>No protein data found</p>
                   </div>

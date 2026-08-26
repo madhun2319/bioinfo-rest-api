@@ -1,12 +1,19 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 import asyncio
-from typing import List
-from app.schemas.aggregate import AggregateResponse, BatchAggregateRequest, BatchAggregateResponse
+from typing import List, Any
+from app.schemas.aggregate import AggregateResponse, BatchAggregateRequest, BatchAggregateResponse, ServiceResponse
 from app.services.pdb_service import fetch_pdb_metadata
 from app.services.ncbi_service import fetch_gene_summary
 from app.services.uniprot_service import fetch_uniprot_metadata
 
 router = APIRouter()
+
+def _format_service_response(result: Any) -> ServiceResponse:
+    if isinstance(result, Exception):
+        if isinstance(result, HTTPException) and result.status_code == 404:
+            return ServiceResponse(status="not_found")
+        return ServiceResponse(status="error", error_message=str(result))
+    return ServiceResponse(status="success", data=result)
 
 async def _process_single_term(term: str) -> AggregateResponse:
     pdb_task = fetch_pdb_metadata(term)
@@ -17,9 +24,9 @@ async def _process_single_term(term: str) -> AggregateResponse:
 
     return AggregateResponse(
         query=term, 
-        pdb_result=results[0] if not isinstance(results[0], Exception) else None, 
-        ncbi_result=results[1] if not isinstance(results[1], Exception) else None,
-        uniprot_result=results[2] if not isinstance(results[2], Exception) else None
+        pdb_result=_format_service_response(results[0]),
+        ncbi_result=_format_service_response(results[1]),
+        uniprot_result=_format_service_response(results[2])
     )
 
 @router.get("/aggregate", response_model=AggregateResponse)
