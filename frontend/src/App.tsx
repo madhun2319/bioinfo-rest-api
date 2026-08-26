@@ -19,10 +19,18 @@ interface NcbiResult {
   organism: string | null;
 }
 
+interface UniprotResult {
+  primary_accession: string;
+  protein_name: string | null;
+  organism: string | null;
+  sequence_length: number | null;
+}
+
 interface AggregateResponse {
   query: string;
   pdb_result: PdbResult | null;
   ncbi_result: NcbiResult | null;
+  uniprot_result: UniprotResult | null;
 }
 
 function App() {
@@ -103,7 +111,7 @@ function App() {
         )}
 
         {result && !loading && (
-          <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* PDB Card */}
             <div className="glass-card flex flex-col h-full transform hover:-translate-y-1 transition-all duration-300">
               <div className="p-6 border-b border-white/10 flex flex-col h-[140px]">
@@ -173,6 +181,43 @@ function App() {
                   <div className="flex-grow flex flex-col items-center justify-center text-slate-400 py-8">
                     <Dna className="w-12 h-12 mb-4 opacity-20" />
                     <p>No gene summary found</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* UniProt Card */}
+            <div className="glass-card flex flex-col h-full transform hover:-translate-y-1 transition-all duration-300">
+              <div className="p-6 border-b border-white/10 flex flex-col h-[140px]">
+                <div className="inline-flex items-center gap-2 bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider w-max mb-4">
+                  <Database className="w-3 h-3" /> UniProtKB
+                </div>
+                <h2 className="text-xl font-bold text-white line-clamp-2 leading-tight">
+                  {result.uniprot_result?.protein_name || 'Protein Unknown'}
+                </h2>
+              </div>
+              <div className="p-6 flex-grow flex flex-col gap-4">
+                {result.uniprot_result ? (
+                  <>
+                    <div className="flex flex-col pb-3 border-b border-white/5">
+                      <span className="text-xs text-slate-400 uppercase tracking-wider mb-1">Accession</span>
+                      <strong className="text-white font-mono text-lg">{result.uniprot_result.primary_accession}</strong>
+                    </div>
+                    <div className="flex flex-col pb-3 border-b border-white/5">
+                      <span className="text-xs text-slate-400 uppercase tracking-wider mb-1">Organism</span>
+                      <strong className="text-slate-200">{result.uniprot_result.organism || 'N/A'}</strong>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-xs text-slate-400 uppercase tracking-wider mb-1">Sequence Length</span>
+                      <strong className="text-slate-200">
+                        {result.uniprot_result.sequence_length ? `${result.uniprot_result.sequence_length} aa` : 'N/A'}
+                      </strong>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex-grow flex flex-col items-center justify-center text-slate-400 py-8">
+                    <Database className="w-12 h-12 mb-4 opacity-20" />
+                    <p>No protein data found</p>
                   </div>
                 )}
               </div>
