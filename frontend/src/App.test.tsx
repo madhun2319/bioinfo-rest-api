@@ -30,7 +30,11 @@ describe('App Component', () => {
             gene_id: '1234',
             name: 'BRCA1',
             description: 'BRCA1 DNA repair associated',
-            organism: 'Homo sapiens'
+            organism: 'Homo sapiens',
+            maplocation: '17q21.31',
+            summary: 'A long biological summary goes here.',
+            aliases: 'BRCAI, BRCC1',
+            exoncount: 31
           }
         },
         uniprot_result: {

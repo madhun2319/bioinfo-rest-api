@@ -87,11 +87,18 @@ async def fetch_gene_summary(gene_id: str) -> GeneSummary:
     if not result:
         raise HTTPException(status_code=404, detail="Gene summary not found")
 
+    genomic_info = result.get("genomicinfo", [])
+    exon_count = genomic_info[0].get("exoncount") if genomic_info else None
+
     summary = GeneSummary(
         gene_id=actual_id,
         name=result.get("name"),
         description=result.get("description"),
         organism=result.get("organism", {}).get("scientificname"),
+        maplocation=result.get("maplocation"),
+        summary=result.get("summary"),
+        aliases=result.get("otheraliases"),
+        exoncount=exon_count
     )
 
     try:

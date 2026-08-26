@@ -7,3 +7,7 @@ class GeneSummary(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
     organism: Optional[str] = None
+    maplocation: Optional[str] = None
+    summary: Optional[str] = None
+    aliases: Optional[str] = None
+    exoncount: Optional[int] = None

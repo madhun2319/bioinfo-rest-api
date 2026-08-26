@@ -17,6 +17,10 @@ interface NcbiResult {
   name: string | null;
   description: string | null;
   organism: string | null;
+  maplocation: string | null;
+  summary: string | null;
+  aliases: string | null;
+  exoncount: number | null;
 }
 
 interface UniprotResult {
@@ -203,7 +207,27 @@ function App() {
                       <span className="text-xs text-slate-400 uppercase tracking-wider mb-1">Organism</span>
                       <strong className="text-slate-200">{result.ncbi_result.data.organism || 'N/A'}</strong>
                     </div>
-                    <div className="mt-2 border-t border-white/10 pt-3 text-sm">
+                    <details className="mt-2 border-t border-white/10 pt-3 text-sm group">
+                      <summary className="cursor-pointer text-purple-400 font-semibold hover:text-purple-300 transition-colors list-none flex items-center gap-1">
+                        <span className="group-open:hidden">▶</span>
+                        <span className="hidden group-open:inline">▼</span>
+                        Gene Structure & Summary
+                      </summary>
+                      <div className="mt-3 flex flex-col gap-2 text-slate-300">
+                        <div className="flex justify-between"><span>Locus:</span> <span>{result.ncbi_result.data.maplocation || 'N/A'}</span></div>
+                        <div className="flex justify-between"><span>Exon Count:</span> <span>{result.ncbi_result.data.exoncount || 'N/A'}</span></div>
+                        <div className="flex flex-col mt-1">
+                          <span className="text-xs uppercase tracking-wider text-slate-400 mb-1">Aliases</span>
+                          <span className="text-xs break-words leading-relaxed">{result.ncbi_result.data.aliases || 'None'}</span>
+                        </div>
+                        {result.ncbi_result.data.summary && (
+                          <div className="mt-2 bg-black/30 p-2 rounded max-h-32 overflow-y-auto text-xs text-slate-400 leading-relaxed border border-white/5 shadow-inner">
+                            {result.ncbi_result.data.summary}
+                          </div>
+                        )}
+                      </div>
+                    </details>
+                    <div className="mt-1 border-t border-white/10 pt-3 text-sm">
                       <a 
                         href={`https://www.ncbi.nlm.nih.gov/gene/${result.ncbi_result.data.gene_id}`} 
                         target="_blank" 
