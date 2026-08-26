@@ -14,6 +14,32 @@ from app.core.http_client import get_client, close_client
 from app.core.redis_client import get_redis, close_redis
 
 # ------------------------------------------------------------------
+# OpenAPI Documentation Metadata
+# ------------------------------------------------------------------
+tags_metadata = [
+    {
+        "name": "Aggregate",
+        "description": "Federated endpoints that combine data from multiple biological databases in a single request.",
+    },
+    {
+        "name": "NCBI",
+        "description": "Direct endpoints for the National Center for Biotechnology Information.",
+    },
+    {
+        "name": "PDB",
+        "description": "Direct endpoints for the Protein Data Bank.",
+    },
+    {
+        "name": "UniProt",
+        "description": "Direct endpoints for the Universal Protein Resource.",
+    },
+    {
+        "name": "System",
+        "description": "Enterprise health and readiness probes.",
+    },
+]
+
+# ------------------------------------------------------------------
 # 1️⃣ Configuration
 # ------------------------------------------------------------------
 from app.core.auth import get_api_key
@@ -42,7 +68,33 @@ async def lifespan(app: FastAPI):
 # ------------------------------------------------------------------
 # 4️⃣ FastAPI app definition
 # ------------------------------------------------------------------
-app = FastAPI(title="BioInfo REST API", dependencies=[Depends(get_api_key)], lifespan=lifespan)
+description = """
+**BioInfo REST API** provides federated, high-throughput access to biological databases.
+
+### Core Features
+* 🚀 **Federated Search:** Query NCBI, UniProt, and PDB simultaneously.
+* ⚡ **High Throughput:** Use `/api/aggregate/batch` for concurrent batch processing.
+* 🔒 **Secure:** Rate-limited and protected via `X-API-Key`.
+"""
+
+app = FastAPI(
+    title="BioInfo REST API",
+    description=description,
+    version="1.0.0",
+    terms_of_service="http://example.com/terms/",
+    contact={
+        "name": "BioInfo API Support",
+        "url": "https://github.com/madhun2319/bioinfo-rest-api",
+        "email": "support@example.com",
+    },
+    license_info={
+        "name": "MIT",
+        "url": "https://opensource.org/licenses/MIT",
+    },
+    openapi_tags=tags_metadata,
+    dependencies=[Depends(get_api_key)], 
+    lifespan=lifespan
+)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded)
 
