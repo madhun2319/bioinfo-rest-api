@@ -22,8 +22,10 @@ interface NcbiResult {
 interface UniprotResult {
   primary_accession: string;
   protein_name: string | null;
+  gene_name: string | null;
   organism: string | null;
   sequence_length: number | null;
+  sequence: string | null;
 }
 
 interface ServiceResponse<T> {
@@ -147,6 +149,19 @@ function App() {
                         {result.pdb_result.data.resolution_combined?.map(r => `${r}Å`).join(', ') || 'N/A'}
                       </strong>
                     </div>
+                    <details className="mt-2 border-t border-white/10 pt-3 text-sm group">
+                      <summary className="cursor-pointer text-blue-400 font-semibold hover:text-blue-300 transition-colors list-none flex items-center gap-1">
+                        <span className="group-open:hidden">▶</span>
+                        <span className="hidden group-open:inline">▼</span>
+                        Advanced Metadata
+                      </summary>
+                      <div className="mt-3 flex flex-col gap-2 text-slate-300">
+                        <div className="flex justify-between"><span>Weight:</span> <span>{result.pdb_result.data.molecular_weight ? `${result.pdb_result.data.molecular_weight} kDa` : 'N/A'}</span></div>
+                        <div className="flex justify-between"><span>Polymers:</span> <span>{result.pdb_result.data.polymer_entity_count || 'N/A'}</span></div>
+                        <div className="flex justify-between"><span>Deposited:</span> <span>{result.pdb_result.data.deposition_date || 'N/A'}</span></div>
+                        <div className="flex justify-between"><span>Released:</span> <span>{result.pdb_result.data.release_date || 'N/A'}</span></div>
+                      </div>
+                    </details>
                   </>
                 ) : result.pdb_result.status === 'error' ? (
                   <div className="flex-grow flex flex-col items-center justify-center text-yellow-400/80 py-8 text-center">
@@ -187,6 +202,16 @@ function App() {
                     <div className="flex flex-col">
                       <span className="text-xs text-slate-400 uppercase tracking-wider mb-1">Organism</span>
                       <strong className="text-slate-200">{result.ncbi_result.data.organism || 'N/A'}</strong>
+                    </div>
+                    <div className="mt-2 border-t border-white/10 pt-3 text-sm">
+                      <a 
+                        href={`https://www.ncbi.nlm.nih.gov/gene/${result.ncbi_result.data.gene_id}`} 
+                        target="_blank" 
+                        rel="noreferrer" 
+                        className="text-purple-400 font-semibold hover:text-purple-300 flex items-center gap-1 transition-colors"
+                      >
+                        View Full Gene Record ↗
+                      </a>
                     </div>
                   </>
                 ) : result.ncbi_result.status === 'error' ? (
@@ -231,6 +256,22 @@ function App() {
                         {result.uniprot_result.data.sequence_length ? `${result.uniprot_result.data.sequence_length} aa` : 'N/A'}
                       </strong>
                     </div>
+                    <details className="mt-2 border-t border-white/10 pt-3 text-sm group">
+                      <summary className="cursor-pointer text-emerald-400 font-semibold hover:text-emerald-300 transition-colors list-none flex items-center gap-1">
+                        <span className="group-open:hidden">▶</span>
+                        <span className="hidden group-open:inline">▼</span>
+                        View Amino Acid Sequence
+                      </summary>
+                      <div className="mt-3 flex flex-col gap-2 text-slate-300">
+                        <div className="flex justify-between"><span>Gene:</span> <span>{result.uniprot_result.data.gene_name || 'N/A'}</span></div>
+                        <div className="mt-1">
+                          <span className="block mb-1 text-xs uppercase tracking-wider text-slate-400">FASTA Sequence</span>
+                          <div className="bg-black/30 p-2 rounded max-h-32 overflow-y-auto font-mono text-[10px] break-all border border-white/5 shadow-inner">
+                            {result.uniprot_result.data.sequence || 'Sequence not available'}
+                          </div>
+                        </div>
+                      </div>
+                    </details>
                   </>
                 ) : result.uniprot_result.status === 'error' ? (
                   <div className="flex-grow flex flex-col items-center justify-center text-yellow-400/80 py-8 text-center">
