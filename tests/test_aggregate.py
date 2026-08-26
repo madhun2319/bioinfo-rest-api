@@ -39,9 +39,12 @@ async def test_aggregate_success(async_client, mocker):
     assert response.status_code == 200
     data = response.json()
     assert data["query"] == "1XYZ"
-    assert data["pdb_result"]["entry_id"] == "1XYZ"
-    assert data["ncbi_result"]["gene_id"] == "1234"
-    assert data["uniprot_result"]["primary_accession"] == "P01308"
+    assert data["pdb_result"]["status"] == "success"
+    assert data["pdb_result"]["data"]["entry_id"] == "1XYZ"
+    assert data["ncbi_result"]["status"] == "success"
+    assert data["ncbi_result"]["data"]["gene_id"] == "1234"
+    assert data["uniprot_result"]["status"] == "success"
+    assert data["uniprot_result"]["data"]["primary_accession"] == "P01308"
 
 
 @pytest.mark.asyncio
@@ -72,6 +75,9 @@ async def test_aggregate_partial_failure(async_client, mocker):
     response = await async_client.get("/api/aggregate?term=1XYZ")
     assert response.status_code == 200
     data = response.json()
-    assert data["pdb_result"] is None
-    assert data["ncbi_result"]["gene_id"] == "1234"
-    assert data["uniprot_result"] is None
+    assert data["pdb_result"]["status"] == "not_found"
+    assert data["pdb_result"]["data"] is None
+    assert data["ncbi_result"]["status"] == "success"
+    assert data["ncbi_result"]["data"]["gene_id"] == "1234"
+    assert data["uniprot_result"]["status"] == "not_found"
+    assert data["uniprot_result"]["data"] is None

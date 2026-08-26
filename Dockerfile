@@ -13,5 +13,5 @@ COPY .env.example .env
 # Expose port
 EXPOSE 8000
 
-# Start FastAPI server via Uvicorn
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Start FastAPI server via Uvicorn with 4 workers for multi-core scaling
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]

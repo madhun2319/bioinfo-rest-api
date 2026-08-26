@@ -7,8 +7,13 @@ api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
 
 async def get_api_key(api_key_header: str = Security(api_key_header)):
     if not settings.APP_API_KEY:
-        # If no API key is configured in the environment, bypass auth (development mode)
-        return None
+        if settings.ENVIRONMENT == "development":
+            return None
+        # Fail secure in production!
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Server is misconfigured: APP_API_KEY is missing in production environment",
+        )
         
     if api_key_header == settings.APP_API_KEY:
         return api_key_header

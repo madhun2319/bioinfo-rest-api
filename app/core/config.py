@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     APP_API_KEY: str | None = None
     REDIS_URL: str = "redis://localhost:6379"
     CORS_ORIGINS: list[str] = ["http://localhost:5173", "http://127.0.0.1:5173"]
+    ENVIRONMENT: str = "production"
 
     model_config = {"env_file": ".env"}
 
