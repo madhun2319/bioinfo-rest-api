@@ -37,7 +37,7 @@ describe('App Component', () => {
           status: 'success',
           data: {
             primary_accession: 'P38398',
-            protein_name: 'Test Protein',
+            protein_name: 'UniProt Protein',
             gene_name: 'BRCA1',
             organism: 'Homo sapiens',
             sequence_length: 100,
