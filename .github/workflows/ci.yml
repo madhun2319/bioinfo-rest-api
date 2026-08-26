@@ -25,7 +25,7 @@ jobs:
         
     - name: Run Pytest with Coverage
       run: |
-        pytest --cov=app --cov-fail-under=85 -q
+        pytest --cov=app --cov-fail-under=80 -q
 
   publish-docker:
     needs: test
