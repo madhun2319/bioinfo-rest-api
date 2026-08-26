@@ -61,3 +61,23 @@ app.include_router(pdb.router, prefix="/api/pdb", tags=["PDB"])
 app.include_router(ncbi.router, prefix="/api/ncbi", tags=["NCBI"])
 app.include_router(uniprot.router, prefix="/api/uniprot", tags=["UniProt"])
 app.include_router(aggregate.router, prefix="/api", tags=["Aggregate"])
+
+# ------------------------------------------------------------------
+# 6️⃣ Enterprise Health & Readiness Probes
+# ------------------------------------------------------------------
+@app.get("/health", tags=["System"])
+async def health_check():
+    """Kubernetes Readiness Probe. Checks if application and Redis are up."""
+    redis_status = "down"
+    try:
+        redis_client = get_redis()
+        if await redis_client.ping():
+            redis_status = "up"
+    except Exception:
+        pass
+
+    return {
+        "status": "healthy" if redis_status == "up" else "degraded",
+        "redis": redis_status,
+        "version": "1.0.0"
+    }
