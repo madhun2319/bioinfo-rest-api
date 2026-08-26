@@ -55,79 +55,76 @@ Join the conversation, ask questions, and propose new features in the **[GitHub 
 
 
 ## 🧬 Overview
-Welcome to the **Bioinformatics REST API Wrapper**. Designed from the ground up to be resilient, memory-efficient, and developer-friendly. This API aggregates critical genomic and structural metadata into a single, federated endpoint. 
+Welcome to the **BioInfo Nexus REST API & Dashboard**. Designed from the ground up to be resilient, enterprise-grade, and developer-friendly. This API aggregates critical genomic, structural, and proteomic metadata into a single, federated platform. 
 
 Whether you're building a massive bioinformatics dashboard or running quick CLI scripts, this API delivers clean, typed, and cached JSON instantly.
 
 ---
 
-## ✨ Features
-- 🚀 **Federated Search Engine:** Query both the **RCSB Protein Data Bank (PDB)** and **NCBI Gene** databases concurrently with a single HTTP request.
-- 🧠 **Smart Caching:** Built-in asynchronous LRU caching (`async-lru`) ensuring lightning-fast subsequent queries and respecting upstream rate limits.
-- 🛡️ **Resilient Connection Pooling:** A global singleton `httpx.AsyncClient` handles high-throughput requests without leaking connections or exhausting memory.
-- 💻 **Zero-Config Environments:** Launch a fully configured IDE right in your browser via GitHub Codespaces with our built-in `.devcontainer`.
+## ✨ Enterprise Features
+- 🚀 **Federated Search Engine:** Query the **RCSB PDB**, **NCBI Gene**, and **UniProtKB** databases concurrently with a single HTTP request.
+- 🧠 **Resilient Redis Caching:** Built-in asynchronous Redis caching with graceful fallback degradation. If the cache goes down, the API stays up.
+- 📊 **React Frontend Dashboard:** Includes a beautiful, glass-morphism Vite/React UI that visually renders the federated data in a dynamic 3-card grid.
+- 🏎️ **Batch Processing & Semaphores:** Need 100 results? The `/api/aggregate/batch` endpoint safely throttles concurrent external HTTP requests to prevent IP bans.
+- 🛡️ **Fail-Secure Authentication:** Native API-key security (`X-API-Key`) that fails securely in production if misconfigured.
+- 🐳 **Multi-Core Dockerization:** Pre-configured Docker images leveraging Gunicorn/Uvicorn workers for high-concurrency cloud scaling.
 
 ---
 
-## 🚀 Quick Start (GitHub Codespaces)
+## 🚀 Quick Start (Local & Frontend)
 
-The easiest way to experience this project is via GitHub Codespaces. No local setup required!
-
-1. Click the **Code** button at the top of this repository.
-2. Select the **Codespaces** tab.
-3. Click **Create codespace on master**.
-
-Your browser will instantly transform into a VS Code environment. The server will start, dependencies will install, and the Pytest suite will auto-configure.
-
-### Run locally
-
+### 1. Start the API (Backend)
 ```bash
-# 1. Clone the repository
+# Clone the repository
 git clone https://github.com/madhun2319/bioinfo-rest-api.git
 cd bioinfo-rest-api
 
-# 2. Install dependencies
+# Install dependencies and start the multi-core server
 pip install -r requirements.txt
-
-# 3. Start the server
-uvicorn app.main:app --reload
+uvicorn app.main:app --port 8000 --reload
 ```
-Navigate to `http://localhost:8000/docs` to view the beautiful interactive Swagger UI.
+Navigate to `http://localhost:8000/docs` to view the Swagger UI.
+
+### 2. Start the Dashboard (Frontend)
+Open a new terminal window:
+```bash
+cd frontend
+npm install
+npm run dev
+```
+Navigate to `http://localhost:5173` to view the BioInfo Nexus dashboard!
 
 ---
 
-## 📡 API Endpoints
+## 📡 Core Endpoints
 
 ### 1. `GET /api/aggregate?term={query}`
-The crown jewel of the API. Fetches federated data concurrently.
+The crown jewel of the API. Fetches federated data from PDB, NCBI, and UniProt concurrently.
 ```json
 {
   "query": "BRCA1",
-  "pdb_result": null,
-  "ncbi_result": {
-    "gene_id": "672",
-    "name": "BRCA1",
-    "description": "BRCA1 DNA repair associated",
-    "organism": "Homo sapiens"
-  }
+  "pdb_result": { "status": "not_found", "data": null },
+  "ncbi_result": { "status": "success", "data": { "gene_id": "147881884", "name": "LOC147881884" } },
+  "uniprot_result": { "status": "success", "data": { "primary_accession": "P38398", "protein_name": "Breast cancer type 1 susceptibility protein" } }
 }
 ```
 
-### 2. `GET /api/pdb/{pdb_id}`
-Returns strictly-typed structural metadata for a specific Protein Data Bank ID.
+### 2. `POST /api/aggregate/batch`
+Submit a list of terms and fetch them concurrently using built-in semaphore rate-limiting.
 
-### 3. `GET /api/ncbi/gene/{gene_id}`
-Returns detailed gene summaries using the NCBI E-utilities `esearch` and `esummary` pipelines.
+### 3. Individual Microservices
+- `GET /api/pdb/{pdb_id}` - Structural metadata
+- `GET /api/ncbi/gene/{gene_id}` - Genetic metadata
+- `GET /api/uniprot/{accession}` - Proteomic metadata
 
 ---
 
-## 🧪 Testing & Architecture
-This project boasts a **100% offline test suite**. Using `pytest-mock`, all network calls are seamlessly intercepted, ensuring tests run in milliseconds without hitting rate limits. 
-
-Simply run:
+## 🧪 Testing & CI/CD
+This project boasts an **80%+ coverage** test suite. Using `pytest-mock`, all network calls are seamlessly intercepted.
 ```bash
-pytest tests/
+pytest --cov=app
 ```
+Our GitHub Actions pipeline automatically enforces test coverage and builds our `ghcr.io` Docker images.
 
 ---
 
