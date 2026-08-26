@@ -12,20 +12,37 @@ describe('App Component', () => {
       json: async () => ({
         query: 'BRCA1',
         pdb_result: {
-          entry_id: '1XYZ',
-          title: 'Test Protein',
-          deposition_date: null,
-          release_date: null,
-          resolution_combined: [1.5],
-          experimental_method: ['X-RAY DIFFRACTION'],
-          polymer_entity_count: 1,
-          molecular_weight: 50000.0,
+          status: 'success',
+          data: {
+            entry_id: '1XYZ',
+            title: 'Test Protein',
+            deposition_date: null,
+            release_date: null,
+            resolution_combined: [1.5],
+            experimental_method: ['X-RAY DIFFRACTION'],
+            polymer_entity_count: 1,
+            molecular_weight: 50000.0,
+          }
         },
         ncbi_result: {
-          gene_id: '1234',
-          name: 'BRCA1',
-          description: 'BRCA1 DNA repair associated',
-          organism: 'Homo sapiens'
+          status: 'success',
+          data: {
+            gene_id: '1234',
+            name: 'BRCA1',
+            description: 'BRCA1 DNA repair associated',
+            organism: 'Homo sapiens'
+          }
+        },
+        uniprot_result: {
+          status: 'success',
+          data: {
+            primary_accession: 'P38398',
+            protein_name: 'Test Protein',
+            gene_name: 'BRCA1',
+            organism: 'Homo sapiens',
+            sequence_length: 100,
+            sequence: 'ABCD'
+          }
         }
       })
     });
