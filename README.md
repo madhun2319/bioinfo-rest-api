@@ -29,6 +29,30 @@ We’re proud to open‑source this API under the MIT license. You’re welcome 
 
 Check out the **README** badges for our license, build status, and package version.
 
+## 📦 Docker Image
+
+A pre‑built Docker image is available on Docker Hub. Pull it with:
+
+```bash
+docker pull ghcr.io/madhun2319/bioinfo-rest-api:latest
+```
+
+Run the container:
+
+```bash
+docker run -p 8000:8000 ghcr.io/madhun2319/bioinfo-rest-api:latest
+```
+
+The API will be reachable at `http://localhost:8000`.
+
+## 📚 Why Open‑Source?
+
+We open‑source this API under the MIT license to encourage community innovation and rapid adoption in biotech research. The core service remains free to use, while we offer **SaaS hosting**, **premium support**, and **enterprise add‑ons** (e.g., SSO, custom rate limits, on‑prem deployment) for organizations that need guaranteed uptime, compliance, and dedicated assistance. By building a vibrant contributor ecosystem we continuously improve the API, and our commercial services fund further development.
+
+## 💬 GitHub Discussions
+
+Join the conversation, ask questions, and propose new features in the **[GitHub Discussions](https://github.com/madhun2319/bioinfo-rest-api/discussions)** forum.
+
 
 ## 🧬 Overview
 Welcome to the **Bioinformatics REST API Wrapper**. Designed from the ground up to be resilient, memory-efficient, and developer-friendly. This API aggregates critical genomic and structural metadata into a single, federated endpoint. 
